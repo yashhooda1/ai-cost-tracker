@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { BarChart2, Building2, Bell, DollarSign, RefreshCw, Trash2, BookOpen } from "lucide-react";
+import { BarChart2, Building2, Bell, DollarSign, RefreshCw, Trash2, BookOpen, CreditCard } from "lucide-react";
 import {
   Alert, Company, DashboardData, PricingRow, UsageRecord,
   getAlerts, getCompanies, getDashboard, getPricing, getUsage, clearCache,
@@ -12,14 +12,16 @@ import UsageTable from "./components/UsageTable";
 import CompanyManager from "./components/CompanyManager";
 import AlertsPanel from "./components/AlertsPanel";
 import PricingTable from "./components/PricingTable";
+import PricingPage from "./components/PricingPage";
 
-type Tab = "dashboard" | "companies" | "alerts" | "pricing";
+type Tab = "dashboard" | "companies" | "alerts" | "pricing" | "subscribe";
 
 const NAV: { id: Tab; label: string; icon: React.ReactNode }[] = [
-  { id: "dashboard", label: "Dashboard", icon: <BarChart2 size={16} /> },
-  { id: "companies", label: "Companies", icon: <Building2 size={16} /> },
-  { id: "alerts", label: "Alerts", icon: <Bell size={16} /> },
-  { id: "pricing", label: "Pricing", icon: <BookOpen size={16} /> },
+  { id: "dashboard",  label: "Dashboard",  icon: <BarChart2 size={16} /> },
+  { id: "companies",  label: "Companies",  icon: <Building2 size={16} /> },
+  { id: "alerts",    label: "Alerts",    icon: <Bell size={16} /> },
+  { id: "pricing",   label: "Pricing",   icon: <BookOpen size={16} /> },
+  { id: "subscribe", label: "Subscribe", icon: <CreditCard size={16} /> },
 ];
 
 export default function App() {
@@ -250,6 +252,16 @@ curl http://localhost:8000/proxy/anthropic/v1/messages \\
               </div>
               <PricingTable rows={pricing} />
             </div>
+          )}
+
+          {/* ── Subscribe ── */}
+          {tab === "subscribe" && (
+            <PricingPage
+              companyId={selectedCompany}
+              companyEmail={companies.find(c => c.id === selectedCompany)?.name
+                ? `billing+${companies.find(c => c.id === selectedCompany)!.name.toLowerCase().replace(/\s+/g, "")}@yourcompany.com`
+                : undefined}
+            />
           )}
         </main>
       </div>

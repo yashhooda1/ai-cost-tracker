@@ -8,9 +8,10 @@ from pydantic import BaseModel
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
+from billing import router as billing_router
 from costs import PRICING
 from database import Base, engine, get_db
-from models import Alert, CacheEntry, Company, UsageRecord
+from models import Alert, CacheEntry, Company, Subscription, UsageRecord
 from proxy import router as proxy_router
 
 Base.metadata.create_all(bind=engine)
@@ -26,6 +27,7 @@ app.add_middleware(
 )
 
 app.include_router(proxy_router)
+app.include_router(billing_router)
 
 DB = Annotated[Session, Depends(get_db)]
 

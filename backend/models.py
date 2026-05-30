@@ -53,6 +53,19 @@ class CacheEntry(Base):
     hit_count: Mapped[int] = mapped_column(Integer, default=0)
 
 
+class Subscription(Base):
+    __tablename__ = "subscriptions"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    company_id: Mapped[int] = mapped_column(Integer, ForeignKey("companies.id"), unique=True, nullable=False)
+    plan: Mapped[str] = mapped_column(String(32), default="free")          # free | starter | growth | enterprise
+    status: Mapped[str] = mapped_column(String(32), default="none")        # none | active | cancelled | past_due
+    stripe_customer_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    stripe_subscription_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=func.now(), onupdate=func.now())
+
+
 class Alert(Base):
     __tablename__ = "alerts"
 
