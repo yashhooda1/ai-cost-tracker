@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proxima — AI Cost Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #060608;
+    --surface: #0d0d12;
+    --surface2: #13131a;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #f0f0f8;
+    --muted: #6b6b80;
+    --accent: #00e5a0;
+    --accent2: #7b5ea7;
+    --red: #ff4d6d;
+    --orange: #ff8c42;
+    --blue: #4da6ff;
+    --yellow: #ffd166;
+    --glow: 0 0 40px rgba(0,229,160,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  /* --- GRID BACKGROUND --- */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* --- NAV --- */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 60px;
+    background: rgba(6,6,8,0.7);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-dot {
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s ease infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 40px;
+    list-style: none;
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: var(--muted);
+  }
+
+  .nav-links a { color: inherit; text-decoration: none; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--text); }
+
+  .nav-cta {
+    background: var(--accent);
+    color: #000;
+    padding: 10px 24px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    font-family: 'DM Mono', monospace;
+    text-decoration: none;
+    letter-spacing: 0.01em;
+    transition: all 0.2s;
+  }
+  .nav-cta:hover { background: #00ffb3; transform: translateY(-1px); }
+
+  /* --- HERO --- */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 120px 60px 80px;
+    text-align: center;
+    z-index: 1;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,229,160,0.08);
+    border: 1px solid rgba(0,229,160,0.2);
+    color: var(--accent);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    padding: 6px 16px;
+    border-radius: 100px;
+    margin-bottom: 36px;
+    animation: fadeUp 0.8s ease both;
+  }
+
+  .hero-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 1.5s ease infinite;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(3rem, 7vw, 6.5rem);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    margin-bottom: 28px;
+    animation: fadeUp 0.8s 0.1s ease both;
+  }
+
+  .h1-dim { color: var(--muted); }
+  .h1-accent { color: var(--accent); }
+
+  .hero-sub {
+    max-width: 580px;
+    font-size: 1.1rem;
+    color: var(--muted);
+    font-weight: 400;
+    margin-bottom: 52px;
+    animation: fadeUp 0.8s 0.2s ease both;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    animation: fadeUp 0.8s 0.3s ease both;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #000;
+    padding: 16px 36px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.9rem;
+    text-decoration: none;
+    letter-spacing: 0.01em;
+    transition: all 0.2s;
+    box-shadow: 0 0 30px rgba(0,229,160,0.3);
+  }
+  .btn-primary:hover { background: #00ffb3; transform: translateY(-2px); box-shadow: 0 0 50px rgba(0,229,160,0.4); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text);
+    padding: 16px 36px;
+    border-radius: 8px;
+    border: 1px solid var(--border2);
+    font-weight: 400;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .btn-ghost:hover { border-color: rgba(255,255,255,0.25); background: rgba(255,255,255,0.04); }
+
+  /* glow orbs */
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .orb-1 { width: 600px; height: 600px; background: rgba(0,229,160,0.06); top: -100px; left: -200px; }
+  .orb-2 { width: 500px; height: 500px; background: rgba(123,94,167,0.08); top: 200px; right: -150px; }
+
+  /* --- TICKER --- */
+  .ticker-wrap {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 0;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+  }
+
+  .ticker {
+    display: flex;
+    gap: 60px;
+    animation: ticker 20s linear infinite;
+    width: max-content;
+  }
+
+  .ticker-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .ticker-item span { color: var(--accent); font-weight: 500; }
+
+  @keyframes ticker {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* --- METRICS STRIP --- */
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    z-index: 1;
+  }
+
+  .metric-cell {
+    background: var(--bg);
+    padding: 48px 40px;
+    text-align: center;
+  }
+
+  .metric-num {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 2.8rem;
+    letter-spacing: -0.04em;
+    margin-bottom: 8px;
+  }
+
+  .metric-num.green { color: var(--accent); }
+  .metric-num.purple { color: var(--accent2); }
+  .metric-num.orange { color: var(--orange); }
+  .metric-num.blue { color: var(--blue); }
+
+  .metric-label {
+    font-size: 0.78rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* --- SECTIONS --- */
+  section {
+    position: relative;
+    z-index: 1;
+    padding: 100px 60px;
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 20px;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 24px;
+  }
+
+  .section-sub {
+    font-size: 1rem;
+    color: var(--muted);
+    max-width: 480px;
+    line-height: 1.7;
+  }
+
+  /* --- DASHBOARD PREVIEW --- */
+  .dashboard-preview {
+    margin: 0 auto;
+    padding: 60px;
+    max-width: 1300px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .dash-window {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03);
+  }
+
+  .dash-titlebar {
+    background: var(--surface2);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .dot-red { width: 12px; height: 12px; background: #ff5f57; border-radius: 50%; }
+  .dot-yellow { width: 12px; height: 12px; background: #febc2e; border-radius: 50%; }
+  .dot-green { width: 12px; height: 12px; background: #28c840; border-radius: 50%; }
+
+  .dash-url {
+    margin-left: 16px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 16px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+    flex: 1;
+    max-width: 300px;
+  }
+
+  .dash-body {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    min-height: 480px;
+  }
+
+  .dash-sidebar {
+    background: var(--surface2);
+    border-right: 1px solid var(--border);
+    padding: 24px 0;
+  }
+
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 20px;
+    font-size: 0.82rem;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .sidebar-item.active {
+    background: rgba(0,229,160,0.08);
+    color: var(--accent);
+    border-right: 2px solid var(--accent);
+  }
+
+  .sidebar-icon {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    background: currentColor;
+    opacity: 0.3;
+  }
+
+  .dash-main {
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+
+  .kpi-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+  }
+
+  .kpi-label {
+    font-size: 0.68rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    font-family: 'DM Mono', monospace;
+    margin-bottom: 6px;
+  }
+
+  .kpi-val {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: -0.03em;
+  }
+
+  .kpi-delta {
+    font-size: 0.68rem;
+    font-family: 'DM Mono', monospace;
+    margin-top: 4px;
+  }
+  .kpi-delta.up { color: var(--accent); }
+  .kpi-delta.down { color: var(--red); }
+
+  .chart-area {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    flex: 1;
+  }
+
+  .chart-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+  }
+
+  .chart-title {
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-bottom: 14px;
+    font-family: 'DM Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+  }
+
+  /* SVG bar chart */
+  .mini-bars { display: flex; gap: 5px; align-items: flex-end; height: 80px; }
+  .bar {
+    flex: 1;
+    background: var(--accent);
+    border-radius: 3px 3px 0 0;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+    animation: growBar 0.8s ease both;
+    transform-origin: bottom;
+  }
+  .bar:nth-child(odd) { opacity: 0.4; }
+  .bar:hover { opacity: 1; }
+
+  @keyframes growBar {
+    from { transform: scaleY(0); }
+    to { transform: scaleY(1); }
+  }
+
+  .mini-line {
+    width: 100%;
+    height: 80px;
+  }
+
+  /* pie placeholder */
+  .pie-wrap { display: flex; gap: 20px; align-items: center; }
+  .pie-svg { width: 80px; height: 80px; }
+  .pie-legend { display: flex; flex-direction: column; gap: 6px; }
+  .pie-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+  }
+  .pie-dot { width: 8px; height: 8px; border-radius: 2px; }
+
+  /* --- FEATURES GRID --- */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-top: 60px;
+  }
+
+  .feature-card {
+    background: var(--bg);
+    padding: 44px 40px;
+    transition: background 0.2s;
+  }
+  .feature-card:hover { background: var(--surface); }
+
+  .feature-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    margin-bottom: 24px;
+  }
+
+  .feature-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+
+  .feature-desc {
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* --- PRICING --- */
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 60px;
+  }
+
+  .price-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px 36px;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+
+  .price-card.featured {
+    border-color: var(--accent);
+    background: linear-gradient(135deg, rgba(0,229,160,0.05), var(--surface));
+  }
+
+  .price-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent);
+    color: #000;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    font-weight: 500;
+    padding: 4px 16px;
+    border-radius: 100px;
+    white-space: nowrap;
+  }
+
+  .price-tier {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 16px;
+  }
+
+  .price-amount {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 3rem;
+    letter-spacing: -0.05em;
+    margin-bottom: 4px;
+  }
+
+  .price-per {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-bottom: 32px;
+  }
+
+  .price-features {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 36px;
+  }
+
+  .price-features li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.88rem;
+    color: var(--muted);
+  }
+
+  .price-features li::before {
+    content: '✓';
+    color: var(--accent);
+    font-family: 'DM Mono', monospace;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+
+  .price-btn {
+    display: block;
+    text-align: center;
+    padding: 14px;
+    border-radius: 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .price-btn-outline {
+    border: 1px solid var(--border2);
+    color: var(--text);
+  }
+  .price-btn-outline:hover { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.04); }
+
+  .price-btn-solid {
+    background: var(--accent);
+    color: #000;
+    font-weight: 500;
+    box-shadow: 0 0 20px rgba(0,229,160,0.25);
+  }
+  .price-btn-solid:hover { background: #00ffb3; transform: translateY(-1px); }
+
+  /* --- CODE BLOCK --- */
+  .code-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-top: 60px;
+  }
+
+  .code-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .code-tab {
+    padding: 12px 24px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .code-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .code-body {
+    padding: 32px 36px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.8;
+    overflow-x: auto;
+  }
+
+  .code-comment { color: #4a4a60; }
+  .code-keyword { color: var(--accent2); }
+  .code-string { color: var(--orange); }
+  .code-fn { color: var(--blue); }
+  .code-accent { color: var(--accent); }
+
+  /* --- TESTIMONIALS --- */
+  .testimonials {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 60px;
+  }
+
+  .testi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 32px;
+  }
+
+  .testi-text {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: #c0c0d0;
+    margin-bottom: 24px;
+  }
+
+  .testi-author {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .testi-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+  }
+
+  .testi-name {
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .testi-role {
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* --- CTA SECTION --- */
+  .cta-section {
+    text-align: center;
+    padding: 120px 60px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cta-inner {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 24px;
+    padding: 80px;
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-inner::before {
+    content: '';
+    position: absolute;
+    top: -100px; left: -100px; right: -100px;
+    height: 200px;
+    background: radial-gradient(ellipse, rgba(0,229,160,0.1), transparent 70%);
+    pointer-events: none;
+  }
+
+  .cta-inner h2 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2rem, 4vw, 3rem);
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+    margin-bottom: 20px;
+  }
+
+  .cta-sub {
+    color: var(--muted);
+    margin-bottom: 48px;
+    font-size: 1rem;
+  }
+
+  .cta-input-row {
+    display: flex;
+    gap: 12px;
+    max-width: 460px;
+    margin: 0 auto;
+  }
+
+  .cta-input {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    padding: 14px 20px;
+    border-radius: 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .cta-input:focus { border-color: var(--accent); }
+  .cta-input::placeholder { color: var(--muted); }
+
+  /* --- FOOTER --- */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 48px 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    z-index: 1;
+  }
+
+  .footer-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+  }
+
+  .footer-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.82rem;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--text); }
+
+  .footer-copy {
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* --- ANIMATIONS --- */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .fade-up {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* table */
+  .usage-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+    font-family: 'DM Mono', monospace;
+  }
+  .usage-table th {
+    text-align: left;
+    color: var(--muted);
+    font-weight: 400;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+  }
+  .usage-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    color: var(--muted);
+  }
+  .usage-table td:first-child { color: var(--text); }
+  .tag {
+    background: rgba(0,229,160,0.1);
+    color: var(--accent);
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 0.65rem;
+  }
+  .tag.orange { background: rgba(255,140,66,0.1); color: var(--orange); }
+  .tag.blue { background: rgba(77,166,255,0.1); color: var(--blue); }
+  .tag.purple { background: rgba(123,94,167,0.15); color: #a07fd6; }
+
+  @media (max-width: 900px) {
+    nav { padding: 16px 24px; }
+    .nav-links { display: none; }
+    section { padding: 60px 24px; }
+    .metrics { grid-template-columns: repeat(2, 1fr); }
+    .features-grid { grid-template-columns: 1fr; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .testimonials { grid-template-columns: 1fr; }
+    .cta-inner { padding: 48px 24px; }
+    footer { flex-direction: column; gap: 24px; text-align: center; }
+    h1 { font-size: 2.8rem; }
+    .dashboard-preview { padding: 24px; }
+    .dash-body { grid-template-columns: 1fr; }
+    .dash-sidebar { display: none; }
+    .kpi-row { grid-template-columns: repeat(2, 1fr); }
+    .chart-area { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">
+    <div class="logo-dot"></div>
+    Proxima
+  </div>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#demo">Demo</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#docs">Docs</a></li>
+  </ul>
+  <a href="#cta" class="nav-cta">Get Early Access →</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <div class="hero-badge">Now tracking $2.3M+ in AI spend across 400+ teams</div>
+
+  <h1>
+    Stop <span class="h1-dim">burning</span> money<br>
+    on <span class="h1-accent">AI APIs.</span>
+  </h1>
+
+  <p class="hero-sub">
+    Proxima sits transparently between your app and OpenAI, Anthropic, and Google AI.
+    Instant cost visibility, automatic savings, zero code changes.
+  </p>
+
+  <div class="hero-actions">
+    <a href="#cta" class="btn-primary">Start for free</a>
+    <a href="#demo" class="btn-ghost">See live demo ↓</a>
+  </div>
+</div>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker">
+    <div class="ticker-item">gpt-4o · $2.50/1M · <span>14ms avg latency</span></div>
+    <div class="ticker-item">claude-sonnet-4-6 · $3.00/1M · <span>cache hit 18%</span></div>
+    <div class="ticker-item">gemini-2.5-pro · $1.25/1M · <span>routing active</span></div>
+    <div class="ticker-item">gpt-4o-mini · $0.15/1M · <span>downgrade saved $41.20</span></div>
+    <div class="ticker-item">claude-haiku · $0.80/1M · <span>3,200 cached responses</span></div>
+    <div class="ticker-item">gemini-flash · $0.10/1M · <span>highest ROI model</span></div>
+    <!-- duplicate for seamless loop -->
+    <div class="ticker-item">gpt-4o · $2.50/1M · <span>14ms avg latency</span></div>
+    <div class="ticker-item">claude-sonnet-4-6 · $3.00/1M · <span>cache hit 18%</span></div>
+    <div class="ticker-item">gemini-2.5-pro · $1.25/1M · <span>routing active</span></div>
+    <div class="ticker-item">gpt-4o-mini · $0.15/1M · <span>downgrade saved $41.20</span></div>
+    <div class="ticker-item">claude-haiku · $0.80/1M · <span>3,200 cached responses</span></div>
+    <div class="ticker-item">gemini-flash · $0.10/1M · <span>highest ROI model</span></div>
+  </div>
+</div>
+
+<!-- METRICS -->
+<div class="metrics">
+  <div class="metric-cell fade-up">
+    <div class="metric-num green">$1.2M</div>
+    <div class="metric-label">AI Spend Tracked</div>
+  </div>
+  <div class="metric-cell fade-up">
+    <div class="metric-num purple">23%</div>
+    <div class="metric-label">Average Savings</div>
+  </div>
+  <div class="metric-cell fade-up">
+    <div class="metric-num orange">400+</div>
+    <div class="metric-label">Teams Active</div>
+  </div>
+  <div class="metric-cell fade-up">
+    <div class="metric-num blue">19</div>
+    <div class="metric-label">Models Supported</div>
+  </div>
+</div>
+
+<!-- DASHBOARD PREVIEW -->
+<div class="dashboard-preview" id="demo">
+  <div class="fade-up">
+    <p class="section-label" style="text-align:center; margin-bottom:12px;">Live dashboard</p>
+    <p style="text-align:center; font-size:0.9rem; color:var(--muted); margin-bottom:32px;">Real-time cost intelligence. No setup required.</p>
+  </div>
+  <div class="dash-window fade-up">
+    <div class="dash-titlebar">
+      <div class="dot-red"></div>
+      <div class="dot-yellow"></div>
+      <div class="dot-green"></div>
+      <div class="dash-url">app.proxima.ai/dashboard</div>
+    </div>
+    <div class="dash-body">
+      <div class="dash-sidebar">
+        <div class="sidebar-item active">
+          <div class="sidebar-icon"></div>
+          Dashboard
+        </div>
+        <div class="sidebar-item">
+          <div class="sidebar-icon"></div>
+          Usage
+        </div>
+        <div class="sidebar-item">
+          <div class="sidebar-icon"></div>
+          Companies
+        </div>
+        <div class="sidebar-item">
+          <div class="sidebar-icon"></div>
+          Alerts
+        </div>
+        <div class="sidebar-item">
+          <div class="sidebar-icon"></div>
+          Pricing
+        </div>
+        <div class="sidebar-item">
+          <div class="sidebar-icon"></div>
+          Settings
+        </div>
+      </div>
+      <div class="dash-main">
+        <!-- KPIs -->
+        <div class="kpi-row">
+          <div class="kpi-card">
+            <div class="kpi-label">Total Spend (30d)</div>
+            <div class="kpi-val" style="color:var(--text)">$10,334</div>
+            <div class="kpi-delta down">+12% vs prev period</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Saved (30d)</div>
+            <div class="kpi-val" style="color:var(--accent)">$1,789</div>
+            <div class="kpi-delta up">↑ 14.8% savings rate</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Cache Hits</div>
+            <div class="kpi-val" style="color:var(--blue)">18.2%</div>
+            <div class="kpi-delta up">↑ 3.1% this week</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Requests</div>
+            <div class="kpi-val" style="color:var(--text)">41,293</div>
+            <div class="kpi-delta up">↑ avg 1,376/day</div>
+          </div>
+        </div>
+        <!-- Charts -->
+        <div class="chart-area">
+          <div class="chart-card">
+            <div class="chart-title">Daily Spend — 30d</div>
+            <div class="mini-bars">
+              <div class="bar" style="height:35%"></div>
+              <div class="bar" style="height:55%"></div>
+              <div class="bar" style="height:42%"></div>
+              <div class="bar" style="height:70%"></div>
+              <div class="bar" style="height:38%"></div>
+              <div class="bar" style="height:60%"></div>
+              <div class="bar" style="height:48%"></div>
+              <div class="bar" style="height:75%"></div>
+              <div class="bar" style="height:52%"></div>
+              <div class="bar" style="height:65%"></div>
+              <div class="bar" style="height:80%"></div>
+              <div class="bar" style="height:45%"></div>
+              <div class="bar" style="height:90%"></div>
+              <div class="bar" style="height:58%"></div>
+              <div class="bar" style="height:72%"></div>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title">Model Breakdown</div>
+            <div class="pie-wrap">
+              <svg class="pie-svg" viewBox="0 0 36 36">
+                <circle cx="18" cy="18" r="15.9" fill="transparent" stroke="#00e5a0" stroke-width="3.2" stroke-dasharray="45 55" stroke-dashoffset="25"/>
+                <circle cx="18" cy="18" r="15.9" fill="transparent" stroke="#7b5ea7" stroke-width="3.2" stroke-dasharray="28 72" stroke-dashoffset="-20"/>
+                <circle cx="18" cy="18" r="15.9" fill="transparent" stroke="#ff8c42" stroke-width="3.2" stroke-dasharray="18 82" stroke-dashoffset="-48"/>
+                <circle cx="18" cy="18" r="15.9" fill="transparent" stroke="#4da6ff" stroke-width="3.2" stroke-dasharray="9 91" stroke-dashoffset="-66"/>
+              </svg>
+              <div class="pie-legend">
+                <div class="pie-item"><div class="pie-dot" style="background:var(--accent)"></div>gpt-4o — 45%</div>
+                <div class="pie-item"><div class="pie-dot" style="background:var(--accent2)"></div>claude-sonnet — 28%</div>
+                <div class="pie-item"><div class="pie-dot" style="background:var(--orange)"></div>gemini-pro — 18%</div>
+                <div class="pie-item"><div class="pie-dot" style="background:var(--blue)"></div>others — 9%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Table -->
+        <div class="chart-card" style="overflow-x:auto">
+          <div class="chart-title">Recent Requests</div>
+          <table class="usage-table">
+            <thead>
+              <tr>
+                <th>Company</th>
+                <th>Model</th>
+                <th>Tokens</th>
+                <th>Cost</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Acme Corp</td>
+                <td>gpt-4o</td>
+                <td>2,140</td>
+                <td>$0.0054</td>
+                <td><span class="tag">cached</span></td>
+              </tr>
+              <tr>
+                <td>BuildFast</td>
+                <td>claude-sonnet</td>
+                <td>891</td>
+                <td>$0.0027</td>
+                <td><span class="tag orange">routed↓</span></td>
+              </tr>
+              <tr>
+                <td>DataFlow Inc</td>
+                <td>gemini-flash</td>
+                <td>3,201</td>
+                <td>$0.0013</td>
+                <td><span class="tag blue">live</span></td>
+              </tr>
+              <tr>
+                <td>NovaTech</td>
+                <td>gpt-4o-mini</td>
+                <td>512</td>
+                <td>$0.0001</td>
+                <td><span class="tag purple">new</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="fade-up">
+    <p class="section-label">What Proxima does</p>
+    <h2 class="section-title">Everything your team<br>needs to cut AI waste.</h2>
+    <p class="section-sub">Ship in one afternoon. See savings by end of day. No AI provider SDK changes needed.</p>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card fade-up">
+      <div class="feature-icon" style="background: rgba(0,229,160,0.1);">🔀</div>
+      <div class="feature-title">Transparent Proxy</div>
+      <div class="feature-desc">Drop-in replacement base URL. Works with existing OpenAI, Anthropic, and Gemini SDKs. Change one line of config — done.</div>
+    </div>
+    <div class="feature-card fade-up">
+      <div class="feature-icon" style="background: rgba(77,166,255,0.1);">⚡</div>
+      <div class="feature-title">Response Caching</div>
+      <div class="feature-desc">SHA-256 semantic cache with 24h TTL. Identical prompts return in &lt;5ms at $0. Your team hits repeat prompts more than you think.</div>
+    </div>
+    <div class="feature-card fade-up">
+      <div class="feature-icon" style="background: rgba(255,140,66,0.1);">🧠</div>
+      <div class="feature-title">Smart Model Routing</div>
+      <div class="feature-desc">Simple prompts auto-downgrade to cheaper tiers: GPT-4o→mini, Opus→Haiku, Pro→Flash. Same quality, fraction of the cost.</div>
+    </div>
+    <div class="feature-card fade-up">
+      <div class="feature-icon" style="background: rgba(123,94,167,0.1);">🏢</div>
+      <div class="feature-title">Multi-Tenant Isolation</div>
+      <div class="feature-desc">Per-company API keys via X-Tracker-Key header. See exactly which team or product is driving which spend. Chargebacks made easy.</div>
+    </div>
+    <div class="feature-card fade-up">
+      <div class="feature-icon" style="background: rgba(255,77,109,0.1);">🚨</div>
+      <div class="feature-title">Budget Alerts</div>
+      <div class="feature-desc">Set daily and monthly spend thresholds per company. Get notified before a runaway job blows your budget. No more surprise invoices.</div>
+    </div>
+    <div class="feature-card fade-up">
+      <div class="feature-icon" style="background: rgba(0,229,160,0.1);">📊</div>
+      <div class="feature-title">Live Dashboard</div>
+      <div class="feature-desc">Cost trends, model breakdowns, cache savings analysis, per-company usage tables — all real-time. Built for engineers and finance.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CODE SECTION -->
+<section id="docs">
+  <div class="fade-up">
+    <p class="section-label">Integration</p>
+    <h2 class="section-title">One line to integrate.<br>Zero code changes.</h2>
+    <p class="section-sub">Point your SDK at Proxima's proxy URL and add your tracker key. That's it.</p>
+  </div>
+  <div class="code-section fade-up">
+    <div class="code-tabs">
+      <div class="code-tab active">Python · OpenAI</div>
+      <div class="code-tab">Python · Anthropic</div>
+      <div class="code-tab">Node.js</div>
+      <div class="code-tab">curl</div>
+    </div>
+    <div class="code-body">
+      <span class="code-comment"># Before: standard OpenAI SDK</span><br>
+      <span class="code-keyword">from</span> openai <span class="code-keyword">import</span> OpenAI<br>
+      client = <span class="code-fn">OpenAI</span>(api_key=<span class="code-string">"your-openai-key"</span>)<br><br>
+
+      <span class="code-comment"># After: add 2 lines → instant tracking + savings</span><br>
+      <span class="code-keyword">from</span> openai <span class="code-keyword">import</span> OpenAI<br>
+      client = <span class="code-fn">OpenAI</span>(<br>
+      &nbsp;&nbsp;api_key=<span class="code-string">"your-openai-key"</span>,<br>
+      &nbsp;&nbsp;base_url=<span class="code-accent">"https://proxy.proxima.ai/openai/v1"</span>,  <span class="code-comment"># ← add this</span><br>
+      &nbsp;&nbsp;default_headers={<span class="code-string">"X-Tracker-Key"</span>: <span class="code-string">"your-company-key"</span>},  <span class="code-comment"># ← and this</span><br>
+      )<br><br>
+
+      <span class="code-comment"># Everything else stays identical — responses, streaming, tools</span><br>
+      response = client.chat.completions.<span class="code-fn">create</span>(<br>
+      &nbsp;&nbsp;model=<span class="code-string">"gpt-4o"</span>,<br>
+      &nbsp;&nbsp;messages=[{<span class="code-string">"role"</span>: <span class="code-string">"user"</span>, <span class="code-string">"content"</span>: <span class="code-string">"Hello!"</span>}]<br>
+      )
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="fade-up">
+    <p class="section-label">Pricing</p>
+    <h2 class="section-title">Pay a fraction of<br>what you save.</h2>
+    <p class="section-sub">Proxima pays for itself on day one. Most teams see positive ROI within 48 hours.</p>
+  </div>
+  <div class="pricing-grid">
+    <div class="price-card fade-up">
+      <div class="price-tier">Starter</div>
+      <div class="price-amount">$0</div>
+      <div class="price-per">forever · up to $5k/mo AI spend</div>
+      <ul class="price-features">
+        <li>Up to 3 companies</li>
+        <li>OpenAI + Anthropic proxy</li>
+        <li>Response caching</li>
+        <li>7-day usage history</li>
+        <li>Email alerts</li>
+        <li>Community support</li>
+      </ul>
+      <a href="#cta" class="price-btn price-btn-outline">Get started free</a>
+    </div>
+    <div class="price-card featured fade-up">
+      <div class="price-badge">Most popular</div>
+      <div class="price-tier">Growth</div>
+      <div class="price-amount">$99</div>
+      <div class="price-per">per month · unlimited AI spend</div>
+      <ul class="price-features">
+        <li>Unlimited companies</li>
+        <li>All 3 providers + 19 models</li>
+        <li>Smart model routing</li>
+        <li>90-day usage history</li>
+        <li>Slack + PagerDuty alerts</li>
+        <li>SSO + audit log</li>
+        <li>Priority support</li>
+      </ul>
+      <a href="#cta" class="price-btn price-btn-solid">Start 14-day trial</a>
+    </div>
+    <div class="price-card fade-up">
+      <div class="price-tier">Enterprise</div>
+      <div class="price-amount">Custom</div>
+      <div class="price-per">for $50k+/mo AI spend</div>
+      <ul class="price-features">
+        <li>Self-hosted deployment</li>
+        <li>Custom model routing rules</li>
+        <li>SLA guarantee</li>
+        <li>Unlimited history + exports</li>
+        <li>Dedicated Slack channel</li>
+        <li>Volume discount negotiation</li>
+        <li>Custom integrations</li>
+      </ul>
+      <a href="#cta" class="price-btn price-btn-outline">Talk to sales →</a>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section>
+  <div class="fade-up">
+    <p class="section-label">Social proof</p>
+    <h2 class="section-title">Teams love seeing<br>where their money goes.</h2>
+  </div>
+  <div class="testimonials">
+    <div class="testi-card fade-up">
+      <p class="testi-text">"We were spending $18k/month on AI APIs with zero visibility. Proxima showed us that 22% of our spend was duplicate prompts. That's $4k back every month on autopilot."</p>
+      <div class="testi-author">
+        <div class="testi-avatar" style="background: rgba(0,229,160,0.15); color: var(--accent);">S</div>
+        <div>
+          <div class="testi-name">Sarah Chen</div>
+          <div class="testi-role">CTO · BuildFast AI</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card fade-up">
+      <p class="testi-text">"The smart routing alone paid for a year of Proxima in week one. We had GPT-4o answering 'what's your name' — that's just waste. Now those go to mini automatically."</p>
+      <div class="testi-author">
+        <div class="testi-avatar" style="background: rgba(77,166,255,0.15); color: var(--blue);">M</div>
+        <div>
+          <div class="testi-name">Marcus Webb</div>
+          <div class="testi-role">Head of Eng · DataFlow Inc</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card fade-up">
+      <p class="testi-text">"Finance kept asking which product team was spending what on AI. Now I just share the Proxima dashboard and the conversation ends in 30 seconds. Game changer."</p>
+      <div class="testi-author">
+        <div class="testi-avatar" style="background: rgba(123,94,167,0.15); color: #a07fd6;">R</div>
+        <div>
+          <div class="testi-name">Riya Patel</div>
+          <div class="testi-role">VP Engineering · NovaTech</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta-section" id="cta">
+  <div class="cta-inner fade-up">
+    <h2>Start saving on<br>AI costs today.</h2>
+    <p class="cta-sub">Free forever up to $5k/month AI spend. No credit card. 2-minute setup.</p>
+    <div class="cta-input-row">
+      <input class="cta-input" type="email" placeholder="you@company.com">
+      <a href="#" class="btn-primary" style="white-space:nowrap; padding: 14px 24px;">Get access →</a>
+    </div>
+    <p style="margin-top:20px; font-size:0.75rem; color:var(--muted); font-family:'DM Mono',monospace;">
+      Joining 400+ teams · No spam · Unsubscribe anytime
+    </p>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">
+    <div class="logo-dot"></div>
+    Proxima
+  </div>
+  <ul class="footer-links">
+    <li><a href="#">Docs</a></li>
+    <li><a href="#">GitHub</a></li>
+    <li><a href="#">Changelog</a></li>
+    <li><a href="#">Privacy</a></li>
+    <li><a href="#">Status</a></li>
+  </ul>
+  <div class="footer-copy">© 2026 Proxima · Built by Yash Hooda</div>
+</footer>
+
+<script>
+  // Intersection observer for fade-up animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  // Code tab switching (visual only)
+  document.querySelectorAll('.code-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.code-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+    });
+  });
+
+  // Sidebar switching
+  document.querySelectorAll('.sidebar-item').forEach(item => {
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+    });
+  });
+
+  // Bar chart hover animation reset
+  document.querySelectorAll('.bar').forEach((bar, i) => {
+    bar.style.animationDelay = `${i * 0.05}s`;
+  });
+
+  // Animated counter for metrics
+  function animateCounter(el, target, prefix = '', suffix = '') {
+    const duration = 2000;
+    const start = performance.now();
+    const isDecimal = target % 1 !== 0;
+
+    function update(time) {
+      const elapsed = time - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = target * eased;
+      el.textContent = prefix + (isDecimal ? current.toFixed(1) : Math.floor(current)) + suffix;
+      if (progress < 1) requestAnimationFrame(update);
+    }
+    requestAnimationFrame(update);
+  }
+
+  const metricsObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const nums = entry.target.querySelectorAll('.metric-num');
+        animateCounter(nums[0], 1.2, '$', 'M');
+        animateCounter(nums[1], 23, '', '%');
+        animateCounter(nums[2], 400, '', '+');
+        animateCounter(nums[3], 19, '', '');
+        metricsObserver.disconnect();
+      }
+    });
+  }, { threshold: 0.5 });
+
+  const metricsEl = document.querySelector('.metrics');
+  if (metricsEl) metricsObserver.observe(metricsEl);
+</script>
+</body>
+</html>
